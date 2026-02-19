@@ -1,8 +1,6 @@
 services:
   couchdb:
     build: .
-    ports:
-      - "5984"
     volumes:
       - couchdb-data:/opt/couchdb/data
     environment:
