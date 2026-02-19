@@ -6,9 +6,9 @@ services:
     volumes:
       - couchdb-data:/opt/couchdb/data
     environment:
+      - SERVICE_URL_COUCHDB_5984
       - COUCHDB_USER=${SERVICE_USER_COUCHDB}
       - COUCHDB_PASSWORD=${SERVICE_PASSWORD_COUCHDB}
-      - SERVICE_FQDN_COUCHDB_5984
     healthcheck:
       test: curl -f -u ${SERVICE_USER_COUCHDB}:${SERVICE_PASSWORD_COUCHDB} http://localhost:5984/_up || exit 1
       interval: 10s
