@@ -1,6 +1,13 @@
 #!/bin/bash
 set -e
 
+# Create admin user if env vars are present (fixes "No Admin Account Found")
+if [ -n "$COUCHDB_USER" ] && [ -n "$COUCHDB_PASSWORD" ]; then
+    echo "Creating admin user configuration..."
+    echo "[admins]" > /opt/couchdb/etc/local.d/10-docker-admin.ini
+    echo "$COUCHDB_USER = $COUCHDB_PASSWORD" >> /opt/couchdb/etc/local.d/10-docker-admin.ini
+fi
+
 # Start CouchDB in the background
 /opt/couchdb/bin/couchdb &
 pid=$!
