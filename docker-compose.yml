@@ -1,0 +1,16 @@
+services:
+  couchdb:
+    build: .
+    volumes:
+      - couchdb-data:/opt/couchdb/data
+    environment:
+      - COUCHDB_USER=${COUCHDB_USER}
+      - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5984/_up"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  couchdb-data:
