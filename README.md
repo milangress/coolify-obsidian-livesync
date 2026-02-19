@@ -1,64 +1,42 @@
-# Obsidian Livesync for Coolify
+# Obsidian Livesync on Coolify
 
-This repository contains the Docker Compose configuration to deploy a self-hosted Obsidian Livesync (CouchDB) server using [Coolify](https://coolify.io).
+A zero-config, self-hosting setup for Obsidian Livesync using [Coolify](https://coolify.io).
 
-## Prerequisites
+## Features
 
-- A Coolify instance.
-- A GitHub repository (this one) connected to Coolify.
+- **Automatic Initialization**: No need to manually run curl commands. databases (`_users`, `_replicator`) are created on startup.
+- **Coolify Optimized**: Uses "Magic Environment Variables" for secure, automatic credential management.
+- **Pre-configured**: `local.ini` is tuned for large requests (4GB limit) and correct CORS settings.
 
 ## Deployment Steps
 
-1.  **Create a New Service in Coolify**:
-    - Select **Docker Compose**.
-    - Choose **GitHub Repository** as the source.
-    - Select this repository and branch.
+1. **Repo Setup**:
+    - Fork or push this repository to your GitHub.
 
-2.  **Configure Environment Variables**:
-    - In the Coolify UI Service Configuration, add the following variables:
-        - `COUCHDB_USER`: Your desired username (e.g., `admin`).
-        - `COUCHDB_PASSWORD`: Your desired password.
+2. **Coolify Setup**:
+    - Create a new resource: **Docker Compose** -> **GitHub Repository**.
+    - Select this repository.
 
-3.  **Configure Domains**:
-    - Set the **Domain** for the `couchdb` service to your desired URL, including the port.
-    - Example: `https://livesync.yourdomain.com:5984`
-    - **Important**: Coolify needs to know the internal port is `5984`. By default, Coolify might try port 80. Explicitly setting the port in the domain configuration (or ensuring the proxy listens to 5984) is crucial. *Actually, correctly in Coolify you usually set the domain to `https://livesync.yourdomain.com` and then inside the service configuration, you set the "Ports Exposes" to `5984`.*
+3. **Environment Variables**:
+    - Coolify should automatically generate:
+        - `SERVICE_USER_COUCHDB`
+        - `SERVICE_PASSWORD_COUCHDB`
+        - `SERVICE_FQDN_COUCHDB_5984`
+    - **Verify** these exist in the "Environment Variables" tab.
 
-4.  **Deploy**:
+4. **Domains**:
+    - In the "General" settings for the service, ensure the **Domain** is set (e.g., `https://livesync.yourdomain.com`).
+    - Because we use `SERVICE_FQDN_COUCHDB_5984`, Coolify knows to route this domain to port `5984`.
+
+5. **Deploy**:
     - Click **Deploy**.
 
-## Initialization (First Time Only)
+## Client Setup (Obsidian)
 
-After the service is running, you must initialize the databases (`_users`, `_replicator`, `obsidian`).
-
-1.  **Open Terminal** in Coolify for the `couchdb` container.
-2.  Run the following command (replace variables with your values):
-
-```bash
-curl -X PUT http://127.0.0.1:5984/_users
-curl -X PUT http://127.0.0.1:5984/_replicator
-curl -X PUT http://127.0.0.1:5984/_global_changes
-```
-
-Or run the official setup script inside the container (if `curl` is installed):
-
-```bash
-# You might need to install curl first if the image doesn't have it
-apt-get update && apt-get install -y curl
-
-curl -s https://raw.githubusercontent.com/vrtmrz/obsidian-livesync/main/utils/couchdb/couchdb-init.sh | \
-hostname=http://127.0.0.1:5984 \
-username=$COUCHDB_USER \
-password=$COUCHDB_PASSWORD \
-bash
-```
-
-## Obsidian Client Setup
-
-1.  Install **Self-hosted LiveSync** plugin in Obsidian.
-2.  Go to **Settings** -> **Self-hosted LiveSync**.
-3.  **Remote Server URL**: `https://livesync.yourdomain.com` (or whatever you configured in Coolify).
-4.  **Username**: The `COUCHDB_USER` you set.
-5.  **Password**: The `COUCHDB_PASSWORD` you set.
-6.  **Database Name**: `obsidian` (or your preferred database name).
-7.  Click **Test Connectivity**.
+1. **Install Plugin**: "Self-hosted LiveSync" in Obsidian.
+2. **Settings**:
+    - **Remote Server URL**: `https://livesync.yourdomain.com` (Your Configured Domain).
+    - **Username**: Copy `SERVICE_USER_COUCHDB` from Coolify.
+    - **Password**: Copy `SERVICE_PASSWORD_COUCHDB` from Coolify.
+    - **Database Name**: `obsidian` (default).
+3. **Test**: Click "Test Connectivity".
