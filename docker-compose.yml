@@ -8,7 +8,7 @@ services:
       - COUCHDB_PASSWORD=${SERVICE_PASSWORD_COUCHDB}
       - SERVICE_FQDN_COUCHDB_5984
     healthcheck:
-      test: curl -f -u ${COUCHDB_USER}:${COUCHDB_PASSWORD} http://localhost:5984/_up || exit 1
+      test: curl -f -u ${SERVICE_USER_COUCHDB}:${SERVICE_PASSWORD_COUCHDB} http://localhost:5984/_up || exit 1
       interval: 10s
       timeout: 5s
       retries: 5
