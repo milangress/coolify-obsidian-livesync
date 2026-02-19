@@ -1,6 +1,8 @@
 services:
   couchdb:
     build: .
+    ports:
+      - "5984"
     volumes:
       - couchdb-data:/opt/couchdb/data
     environment:
@@ -12,6 +14,3 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-volumes:
-  couchdb-data:
